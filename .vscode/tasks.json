@@ -1,0 +1,26 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "C/C++: g++ build active file",
+			"command": "/usr/bin/g++",
+			"args": [
+				// g++ main.cpp -O3 -std=c++11 -o main.out
+				"${workspaceFolder}/main.cpp",
+				"-O3",
+				"-std=c++11",
+				"-o",
+				"${workspaceFolder}/main.out"
+			],
+			"options": {
+				"cwd": "${fileDirname}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compiler: /usr/bin/g++"
+		}
+	]
+}
