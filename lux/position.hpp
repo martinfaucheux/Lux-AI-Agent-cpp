@@ -35,6 +35,19 @@ namespace lux
         {
             return !(operator==(pos));
         }
+        Position &operator+=(const Position &pos)
+        {
+            this->x += pos.x;
+            this->y += pos.y;
+            return *this;
+        }
+
+        const Position operator+(const Position &pos) const
+        {
+            Position newPos = *this;
+            newPos += pos;
+            return newPos;
+        }
 
         Position translate(const DIRECTIONS &direction, int units)
         {
@@ -85,7 +98,9 @@ namespace lux
             return "(" + to_string(this->x) + ", " + to_string(this->y) + ")";
         }
     };
+
     ostream &operator<<(ostream &out, const Position &p);
+
 }
 
 #endif
