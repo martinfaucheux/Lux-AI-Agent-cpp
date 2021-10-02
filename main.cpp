@@ -8,14 +8,64 @@
 using namespace std;
 using namespace lux;
 
+// TODO: move this as a method of cell
+vector<Cell *> getAdjacentCells(Cell const *cell, GameMap &gameMap, vector<Cell *> const &resourceMask, vector<Cell *> const &cityMask)
+{
+	vector<Cell *> adjacentCells{};
+
+	for (int y = -1; y <= 1; y++)
+	{
+		for (int x = -1; x <= 1; x++)
+		{
+			if (!(x == 0 && y == 0))
+			{
+				const Position position = cell->pos + Position(x, y);
+				if (gameMap.isValidPosition(position))
+				{
+					Cell *otherCell = gameMap.getCellByPos(position);
+
+					if (!(count(resourceMask.begin(), resourceMask.end(), otherCell)))
+					{
+						if (!(count(cityMask.begin(), cityMask.end(), otherCell)))
+						{
+							// TODO: remove
+							cout << Annotate::x(otherCell->pos.x, otherCell->pos.y) << endl;
+							adjacentCells.push_back(otherCell);
+							cerr << "after drawing" << endl;
+						}
+					}
+				}
+			}
+		}
+	}
+	return adjacentCells;
+}
+
+Cell *getClosestCell(Cell const *cell, vector<Cell *> const &cellVector)
+{
+	Cell *closestCell;
+	float closestDist = 9999999;
+	for (auto it = cellVector.begin(); it != cellVector.end(); it++)
+	{
+		auto otherCell = *it;
+		float dist = otherCell->pos.distanceTo(cell->pos);
+		if (dist < closestDist)
+		{
+			closestDist = dist;
+			closestCell = otherCell;
+		}
+	}
+	return closestCell;
+}
+
 int main()
 {
 	kit::Agent gameState = kit::Agent();
 	// initialize
 	gameState.initialize();
 
-	// const int max_cities = 2;
-	// map<string, Position> building_objectives{};
+	const int max_cities = 2;
+	map<string, Position> building_objectives{};
 
 	while (true)
 	{
@@ -32,7 +82,9 @@ int main()
 
 		GameMap &gameMap = gameState.map;
 
+		// initialize resourceTiles and cityTiles
 		vector<Cell *> resourceTiles = vector<Cell *>();
+		vector<Cell *> cityTiles = vector<Cell *>();
 		for (int y = 0; y < gameMap.height; y++)
 		{
 			for (int x = 0; x < gameMap.width; x++)
@@ -42,6 +94,10 @@ int main()
 				{
 					resourceTiles.push_back(cell);
 				}
+				if (cell->hasCitytile(player.team))
+				{
+					cityTiles.push_back(cell);
+				}
 			}
 		}
 
@@ -50,12 +106,36 @@ int main()
 		{
 			Unit unit = player.units[i];
 
-			// Position *objective = 0;
+			// get current objective
+			Position *objective = 0;
+			if (building_objectives.count(unit.id))
+			{
+				objective = &building_objectives.at(unit.id);
+			}
 
 			if (unit.isWorker() && unit.canAct())
 			{
 
 				// 1. if no objective, and has enough resource: set objective
+				if (objective == 0 && unit.has_enough_resources())
+				{
+					vector<Cell *> possibleCells = getAdjacentCells(
+						gameMap.getCellByPos(unit.pos),
+						gameMap,
+						resourceTiles,
+						cityTiles);
+
+					for (Cell *cell : possibleCells)
+					{
+						actions.push_back(Annotate::x(
+							cell->pos.x, cell->pos.y));
+					}
+
+					Cell *closestCell = getClosestCell(gameMap.getCellByPos(unit.pos), possibleCells);
+					Position &pos = closestCell->pos;
+					building_objectives.insert({unit.id, pos});
+				}
+				cerr << "Turn " << gameState.turn << endl;
 
 				// if objective
 				//  if at position: build
