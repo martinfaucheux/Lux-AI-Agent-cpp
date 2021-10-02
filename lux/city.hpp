@@ -20,7 +20,7 @@ namespace lux
         {
             this->cityid = cityid;
             this->team = teamid;
-            
+
             this->pos = lux::Position(x, y);
             this->cooldown = cooldown;
         }
@@ -33,7 +33,6 @@ namespace lux
         string research() const
         {
             return "r " + to_string(this->pos.x) + " " + to_string(this->pos.y);
-
         };
         /** returns command to ask this tile to build a worker this turn */
         string buildWorker() const

@@ -76,6 +76,11 @@ namespace lux
             cell->resource.amount = amount;
             cell->resource.type = type;
         }
+        // NOTE: custom code
+        bool isValidPosition(Position const &position) const
+        {
+            return (position.x >= 0 && position.x < width && position.y >= 0 && position.y < height);
+        }
     };
 
 };

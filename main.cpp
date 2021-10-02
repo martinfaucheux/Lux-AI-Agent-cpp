@@ -7,6 +7,7 @@
 
 using namespace std;
 using namespace lux;
+
 int main()
 {
 	kit::Agent gameState = kit::Agent();

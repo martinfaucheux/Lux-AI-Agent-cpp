@@ -109,6 +109,13 @@ namespace lux
         {
             return "p " + this->id;
         }
+
+        // NOTE: custom code
+        bool has_enough_resources() const
+        {
+            return (
+                isWorker() && (cargo.wood >= 100 || cargo.coal >= 100 || cargo.uranium >= 100));
+        }
     };
     class Player
     {
