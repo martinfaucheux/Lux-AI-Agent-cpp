@@ -93,6 +93,8 @@ namespace kit
         {
             this->turn++;
             resetPlayerStates();
+
+            // need to reinstanciate to refresh
             this->map = lux::GameMap(mapWidth, mapHeight);
 
             while (true)
@@ -130,6 +132,7 @@ namespace kit
                     int wood = stoi(updates[i++]);
                     int coal = stoi(updates[i++]);
                     int uranium = stoi(updates[i++]);
+
                     lux::Unit unit = lux::Unit(team, unittype, unitid, x, y, cooldown, wood, coal, uranium);
                     this->players[team].units.push_back(unit);
                 }
@@ -140,6 +143,7 @@ namespace kit
                     string cityid = updates[i++];
                     float fuel = stof(updates[i++]);
                     float lightUpkeep = stof(updates[i++]);
+
                     this->players[team].cities[cityid] = lux::City(team, cityid, fuel, lightUpkeep);
                 }
                 else if (input_identifier == INPUT_CONSTANTS::CITY_TILES)
@@ -150,9 +154,16 @@ namespace kit
                     int x = stoi(updates[i++]);
                     int y = stoi(updates[i++]);
                     float cooldown = stof(updates[i++]);
-                    lux::City * city = &players[team].cities[cityid];
+
+                    // NOTE: original code (with pointer)
+                    lux::City *city = &players[team].cities[cityid];
                     city->addCityTile(x, y, cooldown);
                     players[team].cityTileCount += 1;
+
+                    // TODO: check if this works the same with a ref
+                    // lux::City &city = players[team].cities[cityid];
+                    // city.addCityTile(x, y, cooldown);
+                    // players[team].cityTileCount += 1;
                 }
                 else if (input_identifier == INPUT_CONSTANTS::ROADS)
                 {
@@ -160,7 +171,8 @@ namespace kit
                     int x = stoi(updates[i++]);
                     int y = stoi(updates[i++]);
                     float road = stof(updates[i++]);
-                    lux::Cell * cell = this->map.getCell(x, y);
+
+                    lux::Cell *cell = this->map.getCell(x, y);
                     cell->road = road;
                 }
             }
@@ -179,13 +191,14 @@ namespace kit
         }
 
     private:
-        void resetPlayerStates(){
-            for (int team = 0; team < 2; team++) {
+        void resetPlayerStates()
+        {
+            for (int team = 0; team < 2; team++)
+            {
                 players[team].units.clear();
                 players[team].cities.clear();
                 players[team].cityTileCount = 0;
             }
-            
         };
     };
 }
