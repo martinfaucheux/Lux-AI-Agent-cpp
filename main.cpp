@@ -55,6 +55,27 @@ Cell *getClosestCell(Cell const *cell, vector<Cell *> const &cellVector)
 	return closestCell;
 }
 
+Cell *getCloserPoorestCityTile(Cell const *cell, GameMap &gameMap, Player &player)
+{
+	City *poorestCity = &player.cities.begin()->second;
+	for (auto &element : player.cities)
+	{
+		lux::City *city = &element.second;
+		if (city->fuel < poorestCity->fuel)
+		{
+			poorestCity = city;
+		}
+	}
+
+	vector<Cell *> cityCells{};
+	for (CityTile &cityTile : poorestCity->citytiles)
+	{
+		cityCells.push_back(gameMap.getCellByPos(cityTile.pos));
+	}
+
+	return getClosestCell(cell, cityCells);
+}
+
 int main()
 {
 	kit::Agent gameState = kit::Agent();
@@ -76,7 +97,6 @@ int main()
 
 		Player &player = gameState.players[gameState.id];
 		Player &opponent = gameState.players[(gameState.id + 1) % 2];
-
 		GameMap &gameMap = gameState.map;
 
 		// initialize resourceTiles and cityTiles
@@ -102,6 +122,7 @@ int main()
 		for (int i = 0; i < player.units.size(); i++)
 		{
 			Unit unit = player.units[i];
+			Cell *unitCell = gameMap.getCellByPos(unit.pos);
 
 			// get current objective
 			Position *objective = 0;
@@ -117,7 +138,7 @@ int main()
 				if (objective == 0 && unit.has_enough_resources() && cityTiles.size() < max_cities)
 				{
 					vector<Cell *> possibleCells = getAdjacentCells(
-						gameMap.getCellByPos(unit.pos),
+						unitCell,
 						gameMap,
 						resourceTiles,
 						cityTiles);
@@ -178,20 +199,9 @@ int main()
 					// if unit is a worker and there is no cargo space left, and we have cities, lets return to them
 					if (player.cities.size() > 0)
 					{
-						auto city_iter = player.cities.begin();
-						auto &city = city_iter->second;
+						Cell *closestCityTile = getCloserPoorestCityTile(unitCell, gameMap, player);
 
-						float closestDist = 999999;
-						CityTile *closestCityTile;
-						for (auto &citytile : city.citytiles)
-						{
-							float dist = citytile.pos.distanceTo(unit.pos);
-							if (dist < closestDist)
-							{
-								closestCityTile = &citytile;
-								closestDist = dist;
-							}
-						}
+						// not sure if useful
 						if (closestCityTile != nullptr)
 						{
 							auto dir = unit.pos.directionTo(closestCityTile->pos);
