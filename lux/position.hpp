@@ -51,6 +51,8 @@ namespace lux
             case DIRECTIONS::CENTER:
                 return Position(this->x, this->y);
             }
+            // fix warning
+            return Position(this->x, this->y);
         }
 
         /** Returns Manhattan distance to pos from this position */
