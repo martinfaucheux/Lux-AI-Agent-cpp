@@ -28,10 +28,7 @@ vector<Cell *> getAdjacentCells(Cell const *cell, GameMap &gameMap, vector<Cell 
 					{
 						if (!(count(cityMask.begin(), cityMask.end(), otherCell)))
 						{
-							// TODO: remove
-							cout << Annotate::x(otherCell->pos.x, otherCell->pos.y) << endl;
 							adjacentCells.push_back(otherCell);
-							cerr << "after drawing" << endl;
 						}
 					}
 				}
@@ -117,7 +114,7 @@ int main()
 			{
 
 				// 1. if no objective, and has enough resource: set objective
-				if (objective == 0 && unit.has_enough_resources())
+				if (objective == 0 && unit.has_enough_resources() && cityTiles.size() < max_cities)
 				{
 					vector<Cell *> possibleCells = getAdjacentCells(
 						gameMap.getCellByPos(unit.pos),
@@ -125,23 +122,33 @@ int main()
 						resourceTiles,
 						cityTiles);
 
-					for (Cell *cell : possibleCells)
-					{
-						actions.push_back(Annotate::x(
-							cell->pos.x, cell->pos.y));
-					}
-
 					Cell *closestCell = getClosestCell(gameMap.getCellByPos(unit.pos), possibleCells);
 					Position &pos = closestCell->pos;
 					building_objectives.insert({unit.id, pos});
+					objective = &pos;
+					actions.push_back(Annotate::circle(pos.x, pos.y));
 				}
-				cerr << "Turn " << gameState.turn << endl;
 
 				// if objective
 				//  if at position: build
 				//  else move toward pos
 
-				if (unit.getCargoSpaceLeft() > 0)
+				if (objective != 0)
+				{
+					Position targetPosition = *objective;
+					if (unit.pos == targetPosition)
+					{
+						actions.push_back(unit.buildCity());
+						building_objectives.erase(unit.id);
+					}
+					else
+					{
+						auto dir = unit.pos.directionTo(targetPosition);
+						actions.push_back(unit.move(dir));
+					}
+				}
+
+				else if (unit.getCargoSpaceLeft() > 0)
 				{
 					// if the unit is a worker and we have space in cargo, lets find the nearest resource tile and try to mine it
 					Cell *closestResourceTile;
