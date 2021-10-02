@@ -6,6 +6,10 @@
 namespace lux
 {
     using namespace std;
+
+    // forward declare class to fix circular def
+    class GameMap;
+
     enum ResourceType
     {
         wood = 'w',
@@ -21,19 +25,67 @@ namespace lux
     class Cell
     {
     public:
+        GameMap *gameMap = 0;
         Position pos = Position(-1, -1);
         Resource resource;
         lux::CityTile *citytile;
         float road = 0.0;
         Cell(){};
-        Cell(int x, int y)
+        Cell(int x, int y, GameMap *gameMap)
         {
             pos = Position(x, y);
+            citytile = 0;
+            this->gameMap = gameMap;
         };
         bool hasResource() const
         {
             return this->resource.amount > 0;
         }
+
+        // NOTE: custom methods
+        bool hasCitytile(int team) const
+        {
+            return (citytile != 0 && citytile->team == team);
+        }
+
+        // vector<Cell *> getAdjacentCells(vector<Cell *> resourceMask, vector<Cell *> cityMask) const
+        // {
+        //     vector<Cell *> adjacentCells{};
+
+        //     for (int y = -1; y <= 1; y++)
+        //     {
+        //         for (int x = -1; x <= 1; x++)
+        //         {
+        //             // need ref to map
+        //         }
+        //     }
+        //     return adjacentCells;
+        // }
+
+        // vector<Cell *> getAdjacentCells(vector<Cell *> const resourceMask, vector<Cell *> const cityMask) const
+        // {
+        //     vector<Cell *> adjacentCells{};
+
+        //     for (int y = -1; y <= 1; y++)
+        //     {
+        //         for (int x = -1; x <= 1; x++)
+        //         {
+        //             if (x == 0 && y == 0)
+        //             {
+        //                 continue;
+        //             }
+        //             Cell *cell = this->gameMap->getCell(x, y);
+        //             if (!(count(resourceMask.begin(), resourceMask.end(), cell)))
+        //             {
+        //                 if (!(count(cityMask.begin(), cityMask.end(), cell)))
+        //                 {
+        //                     adjacentCells.push_back(cell);
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     return adjacentCells;
+        // }
     };
     class GameMap
     {
@@ -49,7 +101,7 @@ namespace lux
             {
                 for (int x = 0; x < width; x++)
                 {
-                    map[y][x] = Cell(x, y);
+                    map[y][x] = Cell(x, y, this);
                 }
             }
         };
