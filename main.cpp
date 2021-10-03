@@ -129,6 +129,7 @@ int main()
 			if (building_objectives.count(unit.id))
 			{
 				objective = &building_objectives.at(unit.id);
+				actions.push_back(Annotate::circle(objective->x, objective->y));
 			}
 
 			if (unit.isWorker() && unit.canAct())
@@ -151,9 +152,6 @@ int main()
 				}
 
 				// if objective
-				//  if at position: build
-				//  else move toward pos
-
 				if (objective != 0 && unit.has_enough_resources())
 				{
 					Position targetPosition = *objective;
@@ -164,7 +162,7 @@ int main()
 					}
 					else
 					{
-						auto dir = unit.pos.directionTo(targetPosition);
+						auto dir = PathFinder::getDirection(gameMap, unit.pos, targetPosition);
 						actions.push_back(unit.move(dir));
 					}
 				}

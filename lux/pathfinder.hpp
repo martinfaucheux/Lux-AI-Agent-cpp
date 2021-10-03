@@ -23,10 +23,9 @@ namespace lux
             if (path.size() > 1)
             {
                 Position nextPos = path[1];
-                Position posDiff = nextPos - nextPos;
+                Position posDiff = nextPos - startPos;
                 direction = posDiff.toDirection();
             }
-            cout << direction << endl;
             return direction;
         }
 
@@ -55,8 +54,10 @@ namespace lux
                         const Cell *cell = gameMap.getCellByPos(otherPos);
                         if (cell->citytile == 0)
                         {
-                            path.push_back(otherPos);
-                            queue.push_back(path);
+                            vector<Position> cpPath = path;
+                            cpPath.push_back(otherPos);
+
+                            queue.push_back(cpPath);
                             seen.insert(otherPos);
                         }
                     }
