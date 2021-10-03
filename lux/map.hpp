@@ -98,17 +98,17 @@ namespace lux
         vector<Position> getPlusNeighbors(Position const &pos) const
         {
             vector<Position> result{};
-            for (int x = -1; x <= 1; x++)
+            const int x = pos.x;
+            const int y = pos.y;
+
+            int posList[4][2] = {{x - 1, y}, {x + 1, y}, {x, y - 1}, {x, y + 1}};
+
+            for (auto coord : posList)
             {
-                for (int y = -1; y <= 1; y++)
+                Position adjPos = Position(coord[0], coord[1]);
+                if (this->isValidPosition(adjPos))
                 {
-                    if (!(x == 0 && y == 0))
-                    {
-                        if (this->isValidPosition(pos))
-                        {
-                            result.push_back(pos + Position(x, y));
-                        }
-                    }
+                    result.push_back(adjPos);
                 }
             }
             return result;

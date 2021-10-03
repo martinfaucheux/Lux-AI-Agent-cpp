@@ -38,7 +38,7 @@ namespace lux
 
             while (!queue.empty())
             {
-                vector<Position> path = queue.front();
+                vector<Position> const path = queue.front();
                 queue.pop_front();
                 Position currentPos = path.back();
 
