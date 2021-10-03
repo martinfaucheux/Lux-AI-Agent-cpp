@@ -10,6 +10,7 @@
 #include "game_objects.hpp"
 #include "annotate.hpp"
 #include "city.hpp"
+#include "pathfinder.hpp"
 namespace kit
 {
     using namespace std;

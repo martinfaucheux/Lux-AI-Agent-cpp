@@ -94,6 +94,25 @@ namespace lux
         {
             return (position.x >= 0 && position.x < width && position.y >= 0 && position.y < height);
         }
+
+        vector<Position> getPlusNeighbors(Position const &pos) const
+        {
+            vector<Position> result{};
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    if (!(x == 0 && y == 0))
+                    {
+                        if (this->isValidPosition(pos))
+                        {
+                            result.push_back(pos + Position(x, y));
+                        }
+                    }
+                }
+            }
+            return result;
+        }
     };
 
 };
