@@ -154,7 +154,7 @@ int main()
 				//  if at position: build
 				//  else move toward pos
 
-				if (objective != 0)
+				if (objective != 0 && unit.has_enough_resources())
 				{
 					Position targetPosition = *objective;
 					if (unit.pos == targetPosition)

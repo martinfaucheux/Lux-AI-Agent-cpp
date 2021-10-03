@@ -47,45 +47,6 @@ namespace lux
         {
             return (citytile != 0 && citytile->team == team);
         }
-
-        // vector<Cell *> getAdjacentCells(vector<Cell *> resourceMask, vector<Cell *> cityMask) const
-        // {
-        //     vector<Cell *> adjacentCells{};
-
-        //     for (int y = -1; y <= 1; y++)
-        //     {
-        //         for (int x = -1; x <= 1; x++)
-        //         {
-        //             // need ref to map
-        //         }
-        //     }
-        //     return adjacentCells;
-        // }
-
-        // vector<Cell *> getAdjacentCells(vector<Cell *> const resourceMask, vector<Cell *> const cityMask) const
-        // {
-        //     vector<Cell *> adjacentCells{};
-
-        //     for (int y = -1; y <= 1; y++)
-        //     {
-        //         for (int x = -1; x <= 1; x++)
-        //         {
-        //             if (x == 0 && y == 0)
-        //             {
-        //                 continue;
-        //             }
-        //             Cell *cell = this->gameMap->getCell(x, y);
-        //             if (!(count(resourceMask.begin(), resourceMask.end(), cell)))
-        //             {
-        //                 if (!(count(cityMask.begin(), cityMask.end(), cell)))
-        //                 {
-        //                     adjacentCells.push_back(cell);
-        //                 }
-        //             }
-        //         }
-        //     }
-        //     return adjacentCells;
-        // }
     };
     class GameMap
     {
