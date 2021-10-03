@@ -41,11 +41,23 @@ namespace lux
             this->y += pos.y;
             return *this;
         }
+        Position &operator-=(const Position &pos)
+        {
+            this->x -= pos.x;
+            this->y -= pos.y;
+            return *this;
+        }
 
         const Position operator+(const Position &pos) const
         {
             Position newPos = *this;
             newPos += pos;
+            return newPos;
+        }
+        const Position operator-(const Position &pos) const
+        {
+            Position newPos = *this;
+            newPos -= pos;
             return newPos;
         }
 
@@ -97,9 +109,49 @@ namespace lux
         {
             return "(" + to_string(this->x) + ", " + to_string(this->y) + ")";
         }
+
+        DIRECTIONS toDirection() const
+        {
+            if (x == 0)
+            {
+                if (y == -1)
+                {
+                    return DIRECTIONS::NORTH;
+                }
+                if (y == 1)
+                {
+                    return DIRECTIONS::SOUTH;
+                }
+            }
+            if (
+                y == 0)
+            {
+                if (x == -1)
+                {
+                    return DIRECTIONS::WEST;
+                }
+                if (x == 1)
+                {
+                    return DIRECTIONS::EAST;
+                }
+            }
+            return DIRECTIONS::CENTER;
+        }
+        // operator is needed to be used in set
+        friend bool operator<(const Position &left, const Position &right);
     };
 
     ostream &operator<<(ostream &out, const Position &p);
+
+    bool operator<(const Position &left, const Position &right)
+    {
+        if (left.x != right.x)
+        {
+            return left.x < right.x;
+        }
+
+        return left.y < right.y;
+    }
 
 }
 
