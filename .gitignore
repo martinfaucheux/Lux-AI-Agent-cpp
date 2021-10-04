@@ -1,6 +1,7 @@
 # custom 
 replay.json
 errorlogs/
+*.tar.gz
 
 # Prerequisites
 *.d
