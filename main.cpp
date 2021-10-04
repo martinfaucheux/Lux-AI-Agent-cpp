@@ -8,7 +8,7 @@
 using namespace std;
 using namespace lux;
 
-// TODO: move this as a method of cell
+// DEPRECATED
 vector<Cell *> getAdjacentCells(Cell const *cell, GameMap &gameMap, vector<Cell *> const &resourceMask, vector<Cell *> const &cityMask)
 {
 	vector<Cell *> adjacentCells{};
@@ -76,6 +76,44 @@ Cell *getCloserPoorestCityTile(Cell const *cell, GameMap &gameMap, Player &playe
 	return getClosestCell(cell, cityCells);
 }
 
+Cell *getNewCityCell(Cell const *unitCell, GameMap &gameMap, Player const &player, vector<Cell *> const &existingCityTiles)
+{
+	Cell *possibleCell = 0;
+	// TODO: order by proximity
+	for (Cell *cityCell : existingCityTiles)
+	{
+		int const cityTeam = cityCell->citytile->team;
+		if (cityTeam == player.team)
+		{
+			for (Position &position : gameMap.getPlusNeighbors(cityCell->pos))
+			{
+				// if tile is empty
+				Cell *cellAtPos = gameMap.getCellByPos(position);
+				if (cellAtPos->citytile == 0 && !cellAtPos->hasResource())
+				{
+					return cellAtPos;
+				}
+			}
+		}
+	}
+
+	if (possibleCell == 0)
+	{
+		for (Position &position : gameMap.getPlusNeighbors(unitCell->pos))
+		{
+			// if tile is empty
+			Cell *cellAtPos = gameMap.getCellByPos(position);
+			if (
+				cellAtPos->citytile == 0)
+			{
+				return cellAtPos;
+			}
+		}
+	}
+	// if this happens it will crash
+	return possibleCell;
+}
+
 int main()
 {
 	kit::Agent gameState = kit::Agent();
@@ -138,14 +176,9 @@ int main()
 				// 1. if no objective, and has enough resource: set objective
 				if (objective == 0 && unit.has_enough_resources() && cityTiles.size() < max_cities)
 				{
-					vector<Cell *> possibleCells = getAdjacentCells(
-						unitCell,
-						gameMap,
-						resourceTiles,
-						cityTiles);
-
-					Cell *closestCell = getClosestCell(gameMap.getCellByPos(unit.pos), possibleCells);
+					Cell *closestCell = getNewCityCell(unitCell, gameMap, player, cityTiles);
 					Position &pos = closestCell->pos;
+
 					building_objectives.insert({unit.id, pos});
 					objective = &pos;
 					actions.push_back(Annotate::circle(pos.x, pos.y));
