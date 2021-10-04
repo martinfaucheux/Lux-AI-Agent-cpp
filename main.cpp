@@ -103,8 +103,7 @@ Cell *getNewCityCell(Cell const *unitCell, GameMap &gameMap, Player const &playe
 		{
 			// if tile is empty
 			Cell *cellAtPos = gameMap.getCellByPos(position);
-			if (
-				cellAtPos->citytile == 0)
+			if (cellAtPos->citytile == 0 && !cellAtPos->hasResource())
 			{
 				return cellAtPos;
 			}
