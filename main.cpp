@@ -119,7 +119,8 @@ int main()
 	// initialize
 	gameState.initialize();
 
-	const int max_cities = 2;
+	const int maxCities = 2;
+	const int maxUnits = 1;
 	map<string, Position> building_objectives{};
 
 	while (true)
@@ -135,6 +136,9 @@ int main()
 		Player &player = gameState.players[gameState.id];
 		Player &opponent = gameState.players[(gameState.id + 1) % 2];
 		GameMap &gameMap = gameState.map;
+
+		int forecastedUnitCount = player.units.size();
+		int forecastedCityTileCount = player.cityTileCount;
 
 		// initialize resourceTiles and cityTiles
 		vector<Cell *> resourceTiles = vector<Cell *>();
@@ -173,7 +177,7 @@ int main()
 			{
 
 				// 1. if no objective, and has enough resource: set objective
-				if (objective == 0 && unit.has_enough_resources() && cityTiles.size() < max_cities)
+				if (objective == 0 && unit.has_enough_resources() && forecastedCityTileCount < maxCities)
 				{
 					Cell *closestCell = getNewCityCell(unitCell, gameMap, player, cityTiles);
 					Position &pos = closestCell->pos;
@@ -186,6 +190,9 @@ int main()
 				// if objective
 				if (objective != 0 && unit.has_enough_resources())
 				{
+					// signal that this unit will build
+					forecastedCityTileCount++;
+
 					Position targetPosition = *objective;
 					if (unit.pos == targetPosition)
 					{
@@ -237,6 +244,27 @@ int main()
 							auto dir = unit.pos.directionTo(closestCityTile->pos);
 							actions.push_back(unit.move(dir));
 						}
+					}
+				}
+			}
+		}
+
+		// iterate over cities
+		for (auto &element : player.cities)
+		{
+			City *city = &element.second;
+			for (CityTile &cityTile : city->citytiles)
+			{
+				if (cityTile.cooldown < 1)
+				{
+					if ((player.cityTileCount > player.units.size()) && forecastedUnitCount < maxUnits)
+					{
+						actions.push_back(cityTile.buildWorker());
+						forecastedUnitCount++;
+					}
+					else
+					{
+						actions.push_back(cityTile.research());
 					}
 				}
 			}
